@@ -38,6 +38,12 @@ x86/
 bld/
 [Bb]in/
 [Oo]bj/
+bin/
+obj/
+**/bin/
+**/obj/
+**/Debug/
+**/Release/
 [Ll]og/
 [Ll]ogs/
 
