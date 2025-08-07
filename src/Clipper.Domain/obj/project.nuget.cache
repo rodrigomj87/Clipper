@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "/KWDtiX9LYo=",
+  "dgSpecHash": "RQz+0hcpSffH5em4IxRyAdWAyRKUM83/hxeu6W+AprjpL+mA0DYQb+b0AZalIBAFK4W7OxhET7U226WOCn2xTA==",
   "success": true,
-  "projectFilePath": "D:\\dev\\Clipper\\src\\Clipper.Domain\\Clipper.Domain.csproj",
+  "projectFilePath": "/home/runner/work/Clipper/Clipper/src/Clipper.Domain/Clipper.Domain.csproj",
   "expectedPackageFiles": [],
   "logs": []
 }
