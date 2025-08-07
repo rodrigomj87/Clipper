@@ -111,6 +111,7 @@ app.UseCors("AllowAngular");
 
 // IMPORTANTE: Ordem correta do middleware
 app.UseAuthentication(); // Deve vir antes de UseAuthorization
+app.UseJwtMiddleware(); // Middleware customizado JWT
 app.UseAuthorization();
 
 app.MapControllers();

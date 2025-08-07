@@ -1,12 +1,16 @@
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
 using Clipper.Application.Common.Settings;
+using Clipper.API.Authorization.Policies;
+using Clipper.API.Authorization.Requirements;
+using Clipper.API.Authorization.Handlers;
 
 namespace Clipper.API.Extensions;
 
 /// <summary>
-/// Extensions para configuração do JWT
+/// Extensions para configuração do JWT e autorização
 /// </summary>
 public static class JwtExtensions
 {
@@ -89,26 +93,33 @@ public static class JwtExtensions
     }
 
     /// <summary>
-    /// Adiciona autorização customizada
+    /// Adiciona autorização customizada com policies e handlers
     /// </summary>
     /// <param name="services">Container de serviços</param>
     /// <returns>Container de serviços configurado</returns>
     public static IServiceCollection AddCustomAuthorization(this IServiceCollection services)
     {
+        // Registrar handlers customizados
+        services.AddScoped<IAuthorizationHandler, OwnershipAuthorizationHandler>();
+        services.AddScoped<IAuthorizationHandler, RoleAuthorizationHandler>();
+
+        // Configurar autorização com policies customizadas
         services.AddAuthorization(options =>
         {
-            // Policy básica: usuário autenticado
-            options.AddPolicy("RequireUser", policy =>
-                policy.RequireAuthenticatedUser());
-
-            // Policy para admin (será implementada nas próximas tasks)
-            options.AddPolicy("RequireAdmin", policy =>
-                policy.RequireRole("Admin"));
-
-            // Policy padrão
-            options.DefaultPolicy = options.GetPolicy("RequireUser")!;
+            // Configurar todas as policies via classe centralizada
+            AuthorizationPolicies.ConfigurePolicies(options);
         });
 
         return services;
+    }
+
+    /// <summary>
+    /// Adiciona middleware customizado de JWT
+    /// </summary>
+    /// <param name="app">Application builder</param>
+    /// <returns>Application builder configurado</returns>
+    public static IApplicationBuilder UseJwtMiddleware(this IApplicationBuilder app)
+    {
+        return app.UseMiddleware<Clipper.API.Middleware.JwtMiddleware>();
     }
 }
