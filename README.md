@@ -1,262 +1,226 @@
-# 🎬 Clipper - Cortador Inteligente de Vídeos
+# 🎬 Clipper - AI-Powered Video Clipper
 
-[![.NET](https://img.shields.io/badge/.NET-8.0-512BD4)](https://dotnet.microsoft.com/)
-[![Angular](https://img.shields.io/badge/Angular-17+-DD0031)](https://angular.io/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-3178C6)](https://www.typescriptlang.org/)
-[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+> Sistema inteligente para criação automática de clips de 1 minuto a partir de vídeos do YouTube e Twitch
 
-> Sistema local para automatizar a criação de clips de 1 minuto dos melhores momentos de vídeos do YouTube e Twitch usando IA.
+[![.NET](https://img.shields.io/badge/.NET-8.0-purple.svg)](https://dotnet.microsoft.com/)
+[![Angular](https://img.shields.io/badge/Angular-17+-red.svg)](https://angular.io/)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Issues](https://img.shields.io/github/issues/rodrigomj87/Clipper.svg)](https://github.com/rodrigomj87/Clipper/issues)
 
-## 🚀 Funcionalidades
+## 🚀 **Visão Geral**
 
-- **📺 Dashboard de Canais**: Interface limpa para gerenciar canais do YouTube e Twitch
-- **🤖 Processamento com IA**: Identificação automática dos melhores momentos usando Whisper + GPT
-- **✂️ Geração de Clips**: Cortes inteligentes de 1 minuto com fallback para cortes aleatórios
-- **⚡ Tempo Real**: Acompanhamento do progresso via SignalR
-- **🔄 Automação**: Jobs em background para sincronização e limpeza
-- **📱 Interface Responsiva**: Dashboard moderno construído com Angular Material
+O **Clipper** é uma aplicação local que automatiza a criação de clips virais a partir de vídeos longos do YouTube e Twitch. Utilizando IA (Whisper + GPT), o sistema identifica os melhores momentos e gera clips de 1 minuto prontos para compartilhamento.
 
-## 🏗️ Arquitetura
+### **✨ Principais Features**
+- 🎥 **Download automático** de vídeos do YouTube/Twitch
+- 🧠 **Análise por IA** para identificar momentos virais
+- ✂️ **Criação automática** de clips de 1 minuto
+- 📊 **Dashboard** em tempo real com progresso
+- 💾 **Storage local** para privacidade total
+- 🔄 **Background processing** com filas
 
-### Stack Tecnológica
+## 🏗️ **Arquitetura**
+
+### **Tech Stack**
+- **Backend**: ASP.NET Core 8 + Clean Architecture
+- **Frontend**: Angular 17+ + Material Design
+- **Database**: SQLite (local) + Entity Framework Core
+- **AI Pipeline**: n8n + Whisper + GPT
+- **Real-time**: SignalR
+- **Background Jobs**: Hangfire
+
+### **Estrutura do Projeto**
 ```
-Frontend:  Angular 17+ + Angular Material + SignalR
-Backend:   ASP.NET Core 8 + Entity Framework + Hangfire
-Database:  SQLite (local)
-IA:        n8n + Whisper + GPT-4
-APIs:      YouTube Data API v3 + Twitch Helix API
-```
+src/
+├── Clipper.API/          # 🌐 Controllers e API endpoints
+├── Clipper.Application/  # 📋 Services e lógica de negócio
+├── Clipper.Domain/       # 🏗️ Entidades e interfaces
+├── Clipper.Infrastructure/ # 🔧 EF Core, repositórios e integrações
+├── Clipper.Common/       # 🛠️ Helpers e configurações
+└── Clipper.Tests/        # 🧪 Testes unitários e integração
 
-### Estrutura do Projeto
-```
-📁 Clipper/
-├── 📄 docs/              # Documentação completa
-├── 🔧 src/
-│   ├── Clipper.Domain/         # Entidades e interfaces
-│   ├── Clipper.Application/    # Services e DTOs
-│   ├── Clipper.Infrastructure/ # EF Core, APIs externas
-│   ├── Clipper.API/           # Controllers e middlewares
-│   └── clipper-web/           # Angular SPA
-├── 🧪 tests/             # Testes unitários e integração
-└── 🐳 docker/            # Containerização
-```
-
-## 📋 Documentação
-
-| Documento | Descrição |
-|-----------|-----------|
-| [📋 Projeto Detalhado](docs/PROJETO_DETALHADO.md) | Épicos, cronograma e critérios de aceite |
-| [📝 Backlog de Tarefas](docs/BACKLOG_TAREFAS.md) | Sprint planning e definition of done |
-| [🏛️ Arquitetura Técnica](docs/ARQUITETURA_TECNICA.md) | Stack, camadas e estrutura de dados |
-| [🔌 Especificação de APIs](docs/API_SPECIFICATION.md) | Contratos de API e webhooks |
-| [✅ Checklist de Implementação](docs/CHECKLIST_IMPLEMENTACAO.md) | Guia prático de desenvolvimento |
-| [📊 Status de Implementação](docs/STATUS_IMPLEMENTACAO.md) | Acompanhamento do progresso atual |
-
-## 🚦 Status do Projeto
-
-```
-🎯 FASE ATUAL: Planejamento Completo ✅
-📅 PRÓXIMA FASE: Setup e Fundações
-⏱️ DURAÇÃO ESTIMADA: 8 semanas
-🎯 MVP TARGET: Sistema funcional end-to-end
+docs/                     # 📚 Documentação técnica
+.github/                  # 🔄 Templates e configurações
 ```
 
-### Progresso por Épico
+## 🎯 **Project Management**
 
-| Épico | Status | Progresso |
-|-------|--------|-----------|
-| 🔧 Setup Inicial | 📋 Planejado | `████░░░░░░` 40% |
-| 🗄️ Domínio e Dados | 📋 Planejado | `██░░░░░░░░` 20% |
-| 🔌 Integrações | 📋 Planejado | `░░░░░░░░░░` 0% |
-| 🎥 Processamento IA | 📋 Planejado | `░░░░░░░░░░` 0% |
-| 🖥️ Interface Web | 📋 Planejado | `░░░░░░░░░░` 0% |
-| 🔄 Automação | 📋 Planejado | `░░░░░░░░░░` 0% |
-| 🧪 Testes | 📋 Planejado | `░░░░░░░░░░` 0% |
-| 🚀 Deploy | 📋 Planejado | `░░░░░░░░░░` 0% |
+### **📋 GitHub Issues & Projects**
+Este projeto utiliza **GitHub Issues** e **GitHub Projects** para organização completa:
 
-## 🔧 Instalação e Configuração
+- 📋 **Issues**: Épicos, features, bugs e tasks organizadas
+- 🎯 **Project Board**: [@rodrigomj87's Clipper](https://github.com/users/rodrigomj87/projects)
+- 🏷️ **Labels**: Sistema organizado por tipo, componente e prioridade
+- 📊 **Milestones**: Sprint planning com story points
 
-### Pré-requisitos
+### **🚀 Sprints Organizados**
 
-- **.NET 8 SDK** - [Download](https://dotnet.microsoft.com/download)
-- **Node.js 18+** - [Download](https://nodejs.org/)
-- **Angular CLI** - `npm install -g @angular/cli`
-- **yt-dlp** - [Instalação](https://github.com/yt-dlp/yt-dlp)
-- **n8n Instance** - Para processamento de IA
+#### **Sprint 1: Foundation** (21 pts) - 2-3 semanas
+- ✅ Solution setup e arquitetura
+- 🔄 Entity Framework configuration (#13)
+- 🔄 API básica e estrutura
+- **Milestone**: [#10](https://github.com/rodrigomj87/Clipper/issues/10)
 
-### Setup Rápido
+#### **Sprint 2: Core Features** (34 pts) - 3-4 semanas
+- 📋 CRUD completo (Channels, Videos, Clips)
+- 🔐 Sistema de autenticação
+- 🎨 Dashboard Angular
+- 📊 Relatórios básicos
+- **Milestone**: [#11](https://github.com/rodrigomj87/Clipper/issues/11)
 
+#### **Sprint 3: AI Integration** (55 pts) - 4-5 semanas
+- 🤖 Integração YouTube/Twitch APIs
+- 🧠 Pipeline de IA (Whisper + GPT)
+- 🔄 Background processing
+- 📡 Real-time updates
+- **Milestone**: [#12](https://github.com/rodrigomj87/Clipper/issues/12)
+
+## 🛠️ **Quick Start**
+
+### **Pré-requisitos**
+- .NET 8 SDK
+- Node.js 18+
+- Angular CLI 17+
+- Git
+
+### **Instalação**
 ```bash
-# 1. Clonar o repositório
-git clone https://github.com/seu-usuario/clipper.git
-cd clipper
+# Clone o repositório
+git clone https://github.com/rodrigomj87/Clipper.git
+cd Clipper
 
-# 2. Backend (.NET)
+# Backend
 cd src/Clipper.API
 dotnet restore
-dotnet ef database update
 dotnet run
 
-# 3. Frontend (Angular) - em outro terminal
-cd src/clipper-web
+# Frontend (em outro terminal)
+cd frontend
 npm install
 ng serve
-
-# 4. Acessar aplicação
-# Backend: http://localhost:5000
-# Frontend: http://localhost:4200
 ```
 
-### Configuração de APIs
+### **URLs de Desenvolvimento**
+- 🌐 **API**: https://localhost:7001
+- 🎨 **Frontend**: https://localhost:4200
+- 📊 **Swagger**: https://localhost:7001/swagger
 
-```json
-// appsettings.json
-{
-  "YouTube": {
-    "ApiKey": "your-youtube-api-key"
-  },
-  "Twitch": {
-    "ClientId": "your-twitch-client-id",
-    "ClientSecret": "your-twitch-client-secret"
-  },
-  "N8n": {
-    "BaseUrl": "https://your-n8n-instance.com",
-    "WebhookSecret": "your-webhook-secret"
-  }
-}
+## 📊 **Status Atual**
+
+### **✅ Completado**
+- [x] Documentação técnica completa
+- [x] Solução .NET com Clean Architecture
+- [x] GitHub repository setup
+- [x] Issue templates e workflow
+
+### **🔄 Em Progresso** 
+- [ ] Entity Framework configuration ([#13](https://github.com/rodrigomj87/Clipper/issues/13))
+- [ ] Domain entities setup
+- [ ] Infrastructure layer
+
+### **📈 Métricas**
+- **Issues Total**: 13 criadas
+- **Épicos**: 9 (CLIP-001 a CLIP-009)
+- **Milestones**: 3 sprints organizados
+- **Progress**: Sprint 1 iniciado
+
+## 🤝 **Como Contribuir**
+
+### **Workflow Organizado**
+1. 🔍 **Veja issues com label** `ready-for-dev`
+2. 🎯 **Escolha uma task** e se auto-atribua
+3. 🌿 **Crie branch**: `feature/CLIP-XXX-description`
+4. 💻 **Desenvolva** seguindo Clean Architecture
+5. 📝 **Abra PR** linkando à issue
+6. ✅ **Review e merge**
+
+### **Issue Templates Disponíveis**
+- 🐛 **Bug Report**: Para reportar problemas
+- ✨ **Feature Request**: Para sugerir melhorias
+- 🔧 **Task**: Para tarefas técnicas de desenvolvimento
+
+### **Sistema de Labels**
+- **Tipo**: `epic`, `feature`, `bug`, `task`
+- **Componente**: `backend`, `frontend`, `database`, `ai-integration`
+- **Status**: `ready-for-dev`, `in-progress`, `needs-review`
+- **Prioridade**: `critical`, `high`, `medium`, `low`
+
+## 📚 **Documentação Completa**
+
+### **📋 Planejamento**
+- [📋 Projeto Detalhado](docs/PROJETO_DETALHADO.md)
+- [📝 Backlog de Tarefas](docs/BACKLOG_TAREFAS.md)
+- [🔧 GitHub Config](.github/PROJECT_CONFIG.md)
+
+### **🏗️ Técnica**
+- [🏛️ Arquitetura](docs/ARQUITETURA_TECNICA.md)
+- [📖 API Specification](docs/API_SPECIFICATION.md)
+- [✅ Checklist de Implementação](docs/CHECKLIST_IMPLEMENTACAO.md)
+
+### **📊 Acompanhamento**
+- [📊 Status de Implementação](docs/STATUS_IMPLEMENTACAO.md)
+- [🎯 Project Board](https://github.com/users/rodrigomj87/projects)
+
+## 🔧 **Stack Técnica Detalhada**
+
+### **Backend (.NET 8)**
+```
+📦 Clipper.Domain         → Entidades, Value Objects, Interfaces
+📦 Clipper.Application    → Services, DTOs, Mappers, Validators  
+📦 Clipper.Infrastructure → EF Core, Repositories, External APIs
+📦 Clipper.API           → Controllers, Middlewares, Filters
+📦 Clipper.Common        → Extensions, Helpers, Configurations
+📦 Clipper.Tests         → Unit & Integration Tests
 ```
 
-## 🎯 Como Usar
+### **Tecnologias Integradas**
+- **ORM**: Entity Framework Core 8
+- **Real-time**: SignalR
+- **Background Jobs**: Hangfire
+- **Validation**: FluentValidation
+- **Mapping**: AutoMapper
+- **Testing**: xUnit + Moq
+- **Documentation**: Swagger/OpenAPI
 
-### 1. Cadastrar Canal
-```
-Dashboard → "Adicionar Canal" → Cole URL do YouTube/Twitch → Salvar
-```
-
-### 2. Processar Vídeo
-```
-Canal Card → "Cortar Vídeo" → Aguardar processamento → Visualizar clips
-```
-
-### 3. Gerenciar Clips
-```
-Vídeo → "Ver Clips" → Preview → Download individual ou em lote
-```
-
-## 🔄 Fluxo de Processamento
+## 🎬 **Fluxo de Processamento de Vídeo**
 
 ```mermaid
 graph LR
-    A[Usuário seleciona vídeo] --> B[Download do vídeo]
-    B --> C{Duração > 5min?}
-    C -->|Sim| D[Acelerar vídeo 1.5x]
-    C -->|Não| E[Manter velocidade]
-    D --> F[Enviar para n8n]
-    E --> F
-    F --> G[Transcrição Whisper]
-    G --> H[Análise IA pontos de interesse]
-    H --> I[Gerar clips de 1min]
-    I --> J[Salvar clips localmente]
-    J --> K[Notificar usuário]
+    A[Usuário seleciona vídeo] --> B[Download via yt-dlp]
+    B --> C[Upload para n8n]
+    C --> D[Transcrição Whisper]
+    D --> E[Análise GPT]
+    E --> F[Identificar momentos]
+    F --> G[Gerar clips 1min]
+    G --> H[Download clips]
+    H --> I[Notificar usuário]
 ```
 
-## 🧪 Testes
+## 📄 **License**
 
-```bash
-# Backend
-dotnet test
+Este projeto está licenciado sob a MIT License - veja o arquivo [LICENSE](LICENSE) para detalhes.
 
-# Frontend
-ng test
-ng e2e
+## 🔗 **Links Importantes**
 
-# Cobertura
-dotnet test --collect:"XPlat Code Coverage"
-```
-
-## 🚀 Deploy
-
-### Docker Compose
-```bash
-docker-compose up -d
-```
-
-### Manual
-```bash
-# Build backend
-dotnet publish -c Release -o ./publish
-
-# Build frontend
-ng build --configuration production
-
-# Deploy para servidor
-```
-
-## 🤝 Contribuição
-
-1. Fork o projeto
-2. Crie uma branch para sua feature (`git checkout -b feature/nova-feature`)
-3. Commit suas mudanças (`git commit -m 'feat: adicionar nova feature'`)
-4. Push para a branch (`git push origin feature/nova-feature`)
-5. Abra um Pull Request
-
-### Padrões de Commit
-- `feat:` Nova funcionalidade
-- `fix:` Correção de bug
-- `docs:` Documentação
-- `refactor:` Refatoração
-- `test:` Testes
-
-## 📊 Roadmap
-
-### v1.0 (MVP) - 8 semanas
-- [x] Documentação completa
-- [ ] Sistema básico funcionando
-- [ ] Processamento com IA
-- [ ] Interface web responsiva
-
-### v1.1 - Melhorias
-- [ ] Agendamento automático
-- [ ] Exportação com legendas
-- [ ] Métricas de engajamento
-- [ ] API pública
-
-### v2.0 - Expansão
-- [ ] Suporte a mais plataformas
-- [ ] Processamento em lote
-- [ ] Análise de sentimentos
-- [ ] Machine learning próprio
-
-## 🐛 Issues Conhecidos
-
-- [ ] Rate limiting das APIs externas
-- [ ] Processamento lento para vídeos longos
-- [ ] Dependência de conexão com n8n
-
-## 📄 Licença
-
-Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para detalhes.
-
-## 👥 Time
-
-- **Desenvolvedor Principal**: [Seu Nome]
-- **Arquitetura**: Clean Architecture + DDD
-- **Metodologia**: Scrum com sprints de 1 semana
-
-## 📞 Suporte
-
-- **Issues**: [GitHub Issues](https://github.com/seu-usuario/clipper/issues)
-- **Documentação**: Pasta `/docs` neste repositório
-- **Discord**: [Link do servidor] (futuro)
+- 🐙 **Repository**: [rodrigomj87/Clipper](https://github.com/rodrigomj87/Clipper)
+- 📋 **Issues**: [GitHub Issues](https://github.com/rodrigomj87/Clipper/issues)
+- 🎯 **Project Board**: [@rodrigomj87's Projects](https://github.com/users/rodrigomj87/projects)
+- 📚 **Docs**: [docs/](docs/)
 
 ---
 
-<p align="center">
-  <i>Desenvolvido com ❤️ para automatizar a criação de conteúdo</i>
-</p>
+## 🎯 **Próximos Passos**
 
-<p align="center">
-  <img src="https://img.shields.io/badge/Made%20with-ASP.NET%20Core-512BD4" />
-  <img src="https://img.shields.io/badge/Made%20with-Angular-DD0031" />
-  <img src="https://img.shields.io/badge/Powered%20by-AI-00D4AA" />
-</p>
+1. **Implementar EF Core** ([#13](https://github.com/rodrigomj87/Clipper/issues/13))
+2. **Configurar entities** e migrations
+3. **Desenvolver API base** (CRUD)
+4. **Setup Angular** project
+5. **Integrar real-time** updates
+
+---
+
+**🚀 Ready to Code!** 
+
+> Sistema organizado, documentado e pronto para desenvolvimento colaborativo.
+
+Para começar, veja as [issues ready-for-dev](https://github.com/rodrigomj87/Clipper/labels/ready-for-dev) ou a [documentação técnica](docs/)
