@@ -42,4 +42,9 @@ public class User : BaseEntity
     /// Jobs de processamento criados pelo usuário
     /// </summary>
     public virtual ICollection<ProcessingJob> ProcessingJobs { get; set; } = new List<ProcessingJob>();
+
+    /// <summary>
+    /// Refresh tokens do usuário
+    /// </summary>
+    public virtual ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
 }

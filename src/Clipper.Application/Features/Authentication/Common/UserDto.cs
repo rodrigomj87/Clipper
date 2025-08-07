@@ -4,7 +4,7 @@ namespace Clipper.Application.Features.Authentication.Common;
 /// DTO de usuário para resposta de autenticação
 /// </summary>
 public record UserDto(
-    Guid Id,
+    int Id,
     string Email,
     string Name,
     DateTime CreatedAt

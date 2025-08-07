@@ -1,6 +1,52 @@
 @Clipper.API_HostAddress = http://localhost:5138
 
-GET {{Clipper.API_HostAddress}}/weatherforecast/
+# Teste de health check
+GET {{Clipper.API_HostAddress}}/swagger
 Accept: application/json
+
+###
+
+# Registro de usuário
+POST {{Clipper.API_HostAddress}}/api/auth/register
+Content-Type: application/json
+
+{
+  "email": "teste@exemplo.com",
+  "password": "MinhaSenh@123",
+  "confirmPassword": "MinhaSenh@123",
+  "name": "Usuário Teste"
+}
+
+###
+
+# Login
+POST {{Clipper.API_HostAddress}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "teste@exemplo.com",
+  "password": "MinhaSenh@123"
+}
+
+###
+
+# Refresh Token (substitua o token abaixo por um válido)
+POST {{Clipper.API_HostAddress}}/api/auth/refresh-token
+Content-Type: application/json
+
+{
+  "refreshToken": "SEU_REFRESH_TOKEN_AQUI"
+}
+
+###
+
+# Logout (substitua o token abaixo por um válido)
+POST {{Clipper.API_HostAddress}}/api/auth/logout
+Content-Type: application/json
+Authorization: Bearer SEU_ACCESS_TOKEN_AQUI
+
+{
+  "refreshToken": "SEU_REFRESH_TOKEN_AQUI"
+}
 
 ###

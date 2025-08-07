@@ -1,4 +1,5 @@
 using Clipper.Infrastructure.Data;
+using Clipper.Infrastructure.Configuration;
 using Clipper.API.Extensions;
 using Clipper.Common.Settings;
 using Microsoft.EntityFrameworkCore;
@@ -23,7 +24,17 @@ if (!jwtSettings.HasValidSecretKeyLength)
 }
 
 // Add services to the container.
-builder.Services.AddControllers();
+builder.Services.AddControllers(options =>
+{
+    // Adicionar filtro global de exceções
+    options.Filters.Add<Clipper.API.Filters.ApiExceptionFilterAttribute>();
+});
+
+// Configure MediatR
+builder.Services.AddMediatR(config =>
+{
+    config.RegisterServicesFromAssembly(typeof(Clipper.Application.Features.Authentication.Commands.Login.LoginCommand).Assembly);
+});
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -61,9 +72,24 @@ builder.Services.AddSwaggerGen(c =>
 builder.Services.AddDbContext<ClipperDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+// Configure Infrastructure Layer
+builder.Services.AddInfrastructure(builder.Configuration);
+
 // Configure JWT Authentication
 builder.Services.AddJwtAuthentication(builder.Configuration);
 builder.Services.AddCustomAuthorization();
+
+// Configure CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAngular", policy =>
+    {
+        policy.WithOrigins("http://localhost:4200", "https://localhost:4200")
+              .AllowAnyMethod()
+              .AllowAnyHeader()
+              .AllowCredentials();
+    });
+});
 
 var app = builder.Build();
 
@@ -79,6 +105,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// Configure CORS
+app.UseCors("AllowAngular");
 
 // IMPORTANTE: Ordem correta do middleware
 app.UseAuthentication(); // Deve vir antes de UseAuthorization

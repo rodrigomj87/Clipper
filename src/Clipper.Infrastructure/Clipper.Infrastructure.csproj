@@ -13,10 +13,16 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="8.0.0" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.8" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="9.0.8" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Clipper.Domain\Clipper.Domain.csproj" />
+    <ProjectReference Include="..\Clipper.Application\Clipper.Application.csproj" />
+    <ProjectReference Include="..\Clipper.Common\Clipper.Common.csproj" />
   </ItemGroup>
 
 </Project>
