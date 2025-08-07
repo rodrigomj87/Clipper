@@ -45,11 +45,12 @@ APIs:      YouTube Data API v3 + Twitch Helix API
 
 | Documento | Descrição |
 |-----------|-----------|
-| [📋 Projeto Detalhado](PROJETO_DETALHADO.md) | Épicos, cronograma e critérios de aceite |
-| [📝 Backlog de Tarefas](BACKLOG_TAREFAS.md) | Sprint planning e definition of done |
-| [🏛️ Arquitetura Técnica](ARQUITETURA_TECNICA.md) | Stack, camadas e estrutura de dados |
-| [🔌 Especificação de APIs](API_SPECIFICATION.md) | Contratos de API e webhooks |
-| [✅ Checklist de Implementação](CHECKLIST_IMPLEMENTACAO.md) | Guia prático de desenvolvimento |
+| [📋 Projeto Detalhado](docs/PROJETO_DETALHADO.md) | Épicos, cronograma e critérios de aceite |
+| [📝 Backlog de Tarefas](docs/BACKLOG_TAREFAS.md) | Sprint planning e definition of done |
+| [🏛️ Arquitetura Técnica](docs/ARQUITETURA_TECNICA.md) | Stack, camadas e estrutura de dados |
+| [🔌 Especificação de APIs](docs/API_SPECIFICATION.md) | Contratos de API e webhooks |
+| [✅ Checklist de Implementação](docs/CHECKLIST_IMPLEMENTACAO.md) | Guia prático de desenvolvimento |
+| [📊 Status de Implementação](docs/STATUS_IMPLEMENTACAO.md) | Acompanhamento do progresso atual |
 
 ## 🚦 Status do Projeto
 
