@@ -9,3 +9,4 @@ D:\dev\Clipper\src\Clipper.Domain\obj\Debug\net8.0\Clipper.Domain.dll
 D:\dev\Clipper\src\Clipper.Domain\obj\Debug\net8.0\refint\Clipper.Domain.dll
 D:\dev\Clipper\src\Clipper.Domain\obj\Debug\net8.0\Clipper.Domain.pdb
 D:\dev\Clipper\src\Clipper.Domain\obj\Debug\net8.0\ref\Clipper.Domain.dll
+D:\dev\Clipper\src\Clipper.Domain\obj\Debug\net8.0\Clipper.Domain.sourcelink.json

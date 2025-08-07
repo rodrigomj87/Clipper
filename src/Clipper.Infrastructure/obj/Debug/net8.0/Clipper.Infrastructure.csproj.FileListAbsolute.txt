@@ -9,3 +9,10 @@ D:\dev\Clipper\src\Clipper.Infrastructure\obj\Debug\net8.0\Clipper.Infrastructur
 D:\dev\Clipper\src\Clipper.Infrastructure\obj\Debug\net8.0\refint\Clipper.Infrastructure.dll
 D:\dev\Clipper\src\Clipper.Infrastructure\obj\Debug\net8.0\Clipper.Infrastructure.pdb
 D:\dev\Clipper\src\Clipper.Infrastructure\obj\Debug\net8.0\ref\Clipper.Infrastructure.dll
+D:\dev\Clipper\src\Clipper.Infrastructure\bin\Debug\net8.0\Clipper.Infrastructure.runtimeconfig.json
+D:\dev\Clipper\src\Clipper.Infrastructure\bin\Debug\net8.0\Clipper.Domain.dll
+D:\dev\Clipper\src\Clipper.Infrastructure\bin\Debug\net8.0\Clipper.Domain.pdb
+D:\dev\Clipper\src\Clipper.Infrastructure\obj\Debug\net8.0\Clipper.Infrastructure.csproj.AssemblyReference.cache
+D:\dev\Clipper\src\Clipper.Infrastructure\obj\Debug\net8.0\Clipper.Infrastructure.sourcelink.json
+D:\dev\Clipper\src\Clipper.Infrastructure\obj\Debug\net8.0\Clipper..61B2635A.Up2Date
+D:\dev\Clipper\src\Clipper.Infrastructure\obj\Debug\net8.0\Clipper.Infrastructure.genruntimeconfig.cache

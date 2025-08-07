@@ -97,3 +97,4 @@ D:\dev\Clipper\src\Clipper.Tests\obj\Debug\net8.0\refint\Clipper.Tests.dll
 D:\dev\Clipper\src\Clipper.Tests\obj\Debug\net8.0\Clipper.Tests.pdb
 D:\dev\Clipper\src\Clipper.Tests\obj\Debug\net8.0\Clipper.Tests.genruntimeconfig.cache
 D:\dev\Clipper\src\Clipper.Tests\obj\Debug\net8.0\ref\Clipper.Tests.dll
+D:\dev\Clipper\src\Clipper.Tests\obj\Debug\net8.0\Clipper.Tests.sourcelink.json

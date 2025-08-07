@@ -9,3 +9,4 @@ D:\dev\Clipper\src\Clipper.Common\obj\Debug\net8.0\Clipper.Common.dll
 D:\dev\Clipper\src\Clipper.Common\obj\Debug\net8.0\refint\Clipper.Common.dll
 D:\dev\Clipper\src\Clipper.Common\obj\Debug\net8.0\Clipper.Common.pdb
 D:\dev\Clipper\src\Clipper.Common\obj\Debug\net8.0\ref\Clipper.Common.dll
+D:\dev\Clipper\src\Clipper.Common\obj\Debug\net8.0\Clipper.Common.sourcelink.json
