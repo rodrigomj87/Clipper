@@ -12,7 +12,11 @@ namespace Clipper.Infrastructure.Data
         {
             var optionsBuilder = new DbContextOptionsBuilder<ClipperDbContext>();
             // String de conexão para banco já existente
-            var connectionString = "Server=127.0.0.1,1433;Database=ClipperTestDb;User Id=sa;Password=Tec@123!;MultipleActiveResultSets=true;TrustServerCertificate=True";
+            var connectionString = Environment.GetEnvironmentVariable("CLIPPER_DB_CONNECTION_STRING");
+            if (string.IsNullOrEmpty(connectionString))
+            {
+                throw new InvalidOperationException("Database connection string not found. Please set the CLIPPER_DB_CONNECTION_STRING environment variable.");
+            }
             optionsBuilder.UseSqlServer(connectionString);
             return new ClipperDbContext(optionsBuilder.Options);
         }
