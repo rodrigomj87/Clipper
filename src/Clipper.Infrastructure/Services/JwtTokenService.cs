@@ -29,6 +29,8 @@ public class JwtTokenService : IJwtTokenService
     /// </summary>
     public string GenerateToken(User user)
     {
+        ArgumentNullException.ThrowIfNull(user);
+        
         var tokenHandler = new JwtSecurityTokenHandler();
         var key = Encoding.ASCII.GetBytes(_jwtSettings.SecretKey);
 

@@ -8,6 +8,8 @@ namespace Clipper.API.Controllers;
 /// <summary>
 /// Controller de teste para demonstrar o sistema de autorização
 /// </summary>
+[ApiController]
+[Route("api/test-authorization")]
 [Tags("Test Authorization")]
 public class TestAuthorizationController : ApiControllerBase
 {
@@ -21,43 +23,7 @@ public class TestAuthorizationController : ApiControllerBase
         return Ok(new { message = "Este endpoint é público", timestamp = DateTime.UtcNow });
     }
 
-    /// <summary>
-    /// Endpoint que requer usuário autenticado
-    /// </summary>
-    [HttpGet("user")]
-    [RequireRole("User")]
-    public ActionResult<object> UserEndpoint()
-    {
-        var userId = User.GetUserId();
-        var userEmail = User.GetUserEmail();
 
-        return Ok(new 
-        { 
-            message = "Você está autenticado como usuário", 
-            userId = userId,
-            userEmail = userEmail,
-            timestamp = DateTime.UtcNow 
-        });
-    }
-
-    /// <summary>
-    /// Endpoint que requer administrador
-    /// </summary>
-    [HttpGet("admin")]
-    [RequireAdmin]
-    public ActionResult<object> AdminEndpoint()
-    {
-        var userId = User.GetUserId();
-        var userEmail = User.GetUserEmail();
-
-        return Ok(new 
-        { 
-            message = "Você é um administrador", 
-            userId = userId,
-            userEmail = userEmail,
-            timestamp = DateTime.UtcNow 
-        });
-    }
 
     /// <summary>
     /// Endpoint que demonstra verificação de propriedade
@@ -128,6 +94,74 @@ public class TestAuthorizationController : ApiControllerBase
             isAdmin = isAdmin,
             roles = roles,
             claims = allClaims,
+            timestamp = DateTime.UtcNow 
+        });
+    }
+
+    /// <summary>
+    /// Endpoint protegido para testes de autorização
+    /// </summary>
+    [HttpGet("protected")]
+    [Authorize]
+    public ActionResult<object> ProtectedEndpoint()
+    {
+        var userId = User.GetUserId();
+        var userEmail = User.GetUserEmail();
+
+        return Ok(new 
+        { 
+            message = "Você tem acesso a este endpoint protegido", 
+            userId = userId,
+            userEmail = userEmail,
+            timestamp = DateTime.UtcNow 
+        });
+    }
+
+    /// <summary>
+    /// Endpoint para informações do usuário (alias para me)
+    /// </summary>
+    [HttpGet("user-info")]
+    [Authorize]
+    public ActionResult<object> UserInfoEndpoint()
+    {
+        return MeEndpoint();
+    }
+
+    /// <summary>
+    /// Endpoint que requer administrador específico
+    /// </summary>
+    [HttpGet("admin-only")]
+    [RequireAdmin]
+    public ActionResult<object> AdminOnlyEndpoint()
+    {
+        var userId = User.GetUserId();
+        var userEmail = User.GetUserEmail();
+
+        return Ok(new 
+        { 
+            message = "Você é um administrador", 
+            userId = userId,
+            userEmail = userEmail,
+            timestamp = DateTime.UtcNow 
+        });
+    }
+
+    /// <summary>
+    /// Endpoint que testa ownership
+    /// </summary>
+    [HttpGet("ownership/{resourceId}")]
+    [RequireRole("User")]
+    public ActionResult<object> OwnershipEndpoint(int resourceId)
+    {
+        var userId = User.GetUserId();
+        var userEmail = User.GetUserEmail();
+
+        return Ok(new 
+        { 
+            message = $"Acessando recurso {resourceId}", 
+            resourceId = resourceId,
+            userId = userId,
+            userEmail = userEmail,
             timestamp = DateTime.UtcNow 
         });
     }

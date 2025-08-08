@@ -1,10 +1,2 @@
-namespace Clipper.Tests;
-
-public class UnitTest1
-{
-    [Fact]
-    public void Test1()
-    {
-
-    }
-}
+// Este arquivo foi substituído pelos testes específicos organizados por categoria.
+// Veja as pastas: Integration/, Unit/, E2E/, Performance/, Security/

@@ -7,7 +7,6 @@ namespace Clipper.API.Controllers;
 /// Controller base com configurações comuns para todos os controllers da API
 /// </summary>
 [ApiController]
-[Route("api/[controller]")]
 [Produces("application/json")]
 public abstract class ApiControllerBase : ControllerBase
 {

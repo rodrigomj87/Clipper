@@ -13,6 +13,8 @@ namespace Clipper.API.Controllers;
 /// <summary>
 /// Controller responsável pela autenticação de usuários
 /// </summary>
+[ApiController]
+[Route("api/auth")]
 [Tags("Authentication")]
 public class AuthController : ApiControllerBase
 {

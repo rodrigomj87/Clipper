@@ -8,19 +8,22 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Configurar e validar JwtSettings
 var jwtSettings = new JwtSettings();
-builder.Configuration.GetSection(JwtSettings.SectionName).Bind(jwtSettings);
+builder.Configuration.GetSection("Jwt").Bind(jwtSettings);
 
-// Validação crítica de segurança
-if (!jwtSettings.IsValid)
+// Validação crítica de segurança (exceto em ambiente de teste)
+if (!builder.Environment.EnvironmentName.Equals("Testing", StringComparison.OrdinalIgnoreCase))
 {
-    throw new InvalidOperationException(
-        "Configurações JWT inválidas. Verifique se SecretKey, Issuer e Audience estão configurados corretamente.");
-}
+    if (!jwtSettings.IsValid)
+    {
+        throw new InvalidOperationException(
+            "Configurações JWT inválidas. Verifique se SecretKey, Issuer e Audience estão configurados corretamente.");
+    }
 
-if (!jwtSettings.HasValidSecretKeyLength)
-{
-    throw new InvalidOperationException(
-        "A chave secreta JWT deve ter pelo menos 256 bits (32 caracteres). Use User Secrets ou variáveis de ambiente.");
+    if (!jwtSettings.HasValidSecretKeyLength)
+    {
+        throw new InvalidOperationException(
+            "A chave secreta JWT deve ter pelo menos 256 bits (32 caracteres). Use User Secrets ou variáveis de ambiente.");
+    }
 }
 
 // Add services to the container.
@@ -143,6 +146,9 @@ app.MapGet("/weatherforecast", () =>
 .WithOpenApi();
 
 app.Run();
+
+// Tornar Program acessível para testes de integração
+public partial class Program { }
 
 record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
 {
