@@ -74,7 +74,11 @@ public abstract class IntegrationTestBase : IClassFixture<WebApplicationFactory<
                 }
 
                 // Adicionar contexto usando SQL Server local (local)\SQLSERVER2022, usuário 'sa', senha 'Tec@123!'
-                var connectionString = "Server=127.0.0.1,1433;Database=ClipperTestDb;User Id=sa;Password=Tec@123!;MultipleActiveResultSets=true;TrustServerCertificate=True";
+                var connectionString = Environment.GetEnvironmentVariable("TEST_DB_CONNECTION_STRING");
+                if (string.IsNullOrWhiteSpace(connectionString))
+                {
+                    throw new InvalidOperationException("Environment variable TEST_DB_CONNECTION_STRING is not set. Please set it to a valid test database connection string.");
+                }
                 services.AddDbContext<ClipperDbContext>(options =>
                 {
                     options.UseSqlServer(connectionString);
