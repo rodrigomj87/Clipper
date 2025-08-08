@@ -86,6 +86,9 @@ builder.Services.AddControllers(options =>
     options.Filters.Add<Clipper.API.Filters.ApiExceptionFilterAttribute>();
 });
 
+// Adicionar serviços de segurança (XSS, PasswordValidation)
+builder.Services.AddSecurityServices();
+
 // Configure MediatR
 builder.Services.AddMediatR(config =>
 {
@@ -175,14 +178,8 @@ if (app.Environment.IsDevelopment())
 app.UseRateLimiter();
 
 app.UseHttpsRedirection();
-// Middleware de headers de segurança
-app.Use(async (context, next) =>
-{
-    context.Response.Headers["X-Content-Type-Options"] = "nosniff";
-    context.Response.Headers["X-Frame-Options"] = "DENY";
-    context.Response.Headers["X-XSS-Protection"] = "1; mode=block";
-    await next();
-});
+// Middleware de headers de segurança (global)
+app.UseMiddleware<Clipper.API.Middleware.SecurityHeadersMiddleware>();
 
 // Configure CORS
 app.UseCors("AllowAngular");
