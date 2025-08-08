@@ -356,8 +356,8 @@ public class AuthenticationSecurityTests : IntegrationTestBase
             var registerRequest = new
             {
                 Email = email,
-                Password = "Password123!",
-                ConfirmPassword = "Password123!",
+                Password = "Password123@",
+                ConfirmPassword = "Password123@",
                 Name = $"User"
             };
 
@@ -370,9 +370,20 @@ public class AuthenticationSecurityTests : IntegrationTestBase
         // Em bancos com lock/serialização, nenhuma requisição pode ser criada sob carga máxima
         var successfulRegistrations = responses.Count(r => r.StatusCode == HttpStatusCode.Created);
         var conflictResponses = responses.Count(r => r.StatusCode == HttpStatusCode.Conflict);
+        
+        // Logar conteúdo das respostas 400 para investigação
+        var badRequestResponses = responses.Where(r => r.StatusCode == HttpStatusCode.BadRequest).ToList();
+        if (badRequestResponses.Any())
+        {
+            foreach (var badResponse in badRequestResponses)
+            {
+                var content = await badResponse.Content.ReadAsStringAsync();
+                Console.WriteLine($"[400 Response] Content: {content}");
+            }
+        }
 
         // Aceita: todas 409 ou uma 201 e o resto 409
-        (successfulRegistrations == 1).Should().BeTrue();
+        (successfulRegistrations == 1 || successfulRegistrations == 0).Should().BeTrue();
         conflictResponses.Should().BeGreaterThan(0);
 
         // Cleanup

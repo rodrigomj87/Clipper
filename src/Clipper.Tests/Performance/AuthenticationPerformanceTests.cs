@@ -102,7 +102,7 @@ public class AuthenticationPerformanceTests : IntegrationTestBase
                 Email = $"user{i}@example.com",
                 Password = "Password123!",
                 ConfirmPassword = "Password123!",
-                Name = $"User {i}"
+                Name = $"User"
             });
 
             tasks.Add(Client.PostAsync("/api/auth/register",
