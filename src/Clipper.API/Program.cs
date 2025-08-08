@@ -137,28 +137,18 @@ builder.Services.AddSwaggerGen(c =>
 builder.Services.AddDbContext<ClipperDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+
+// Registrar CorsSettings
+builder.Services.Configure<Clipper.Application.Common.Settings.CorsSettings>(builder.Configuration.GetSection("CorsSettings"));
+// Registrar políticas CORS via extensão modular
+builder.Services.AddCorsPolicy(builder.Configuration);
+
 // Configure Infrastructure Layer
 builder.Services.AddInfrastructure(builder.Configuration);
 
 // Configure JWT Authentication
 builder.Services.AddJwtAuthentication(builder.Configuration);
 builder.Services.AddCustomAuthorization();
-
-// Configure CORS
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowAngular", policy =>
-    {
-        policy.WithOrigins(
-            "http://localhost:4200",
-            "https://localhost:4200",
-            "http://localhost:3000"
-        )
-        .AllowAnyMethod()
-        .AllowAnyHeader()
-        .AllowCredentials();
-    });
-});
 
 var app = builder.Build();
 
@@ -173,7 +163,6 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-
 // Middleware de Rate Limiting
 app.UseRateLimiter();
 
@@ -181,8 +170,8 @@ app.UseHttpsRedirection();
 // Middleware de headers de segurança (global)
 app.UseMiddleware<Clipper.API.Middleware.SecurityHeadersMiddleware>();
 
-// Configure CORS
-app.UseCors("AllowAngular");
+// Aplicar política CORS conforme ambiente
+Clipper.API.Configuration.CorsConfiguration.ConfigureCors(app, app.Environment);
 
 // IMPORTANTE: Ordem correta do middleware
 app.UseAuthentication(); // Deve vir antes de UseAuthorization
