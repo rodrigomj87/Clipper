@@ -86,6 +86,19 @@ builder.Services.AddControllers(options =>
     options.Filters.Add<Clipper.API.Filters.ApiExceptionFilterAttribute>();
 });
 
+// Registrar IMemoryCache
+builder.Services.AddMemoryCache();
+
+// Registrar RateLimitSettings
+builder.Services.Configure<Clipper.Application.Common.Settings.RateLimitSettings>(builder.Configuration.GetSection("RateLimitSettings"));
+
+// Registrar BruteForceProtectionService
+builder.Services.AddSingleton<Clipper.Application.Common.Interfaces.IBruteForceProtectionService, Clipper.Infrastructure.Services.BruteForceProtectionService>();
+
+// Registrar RateLimitingMiddleware (se for usado como middleware global)
+// Registrar RateLimitingMiddleware como IRateLimitingService para uso no attribute
+builder.Services.AddSingleton<Clipper.API.Attributes.IRateLimitingService, Clipper.API.Middleware.RateLimitingMiddleware>();
+
 // Adicionar serviços de segurança (XSS, PasswordValidation)
 builder.Services.AddSecurityServices();
 
@@ -162,6 +175,9 @@ if (app.Environment.IsDevelopment())
         c.RoutePrefix = string.Empty; // Swagger na raiz
     });
 }
+
+// Middleware global de rate limiting custom
+app.UseMiddleware<Clipper.API.Middleware.RateLimitingMiddleware>();
 
 // Middleware de Rate Limiting
 app.UseRateLimiter();

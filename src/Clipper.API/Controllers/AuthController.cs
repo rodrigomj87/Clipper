@@ -26,7 +26,7 @@ public class AuthController : ApiControllerBase
     /// <param name="request">Dados de login (email e senha)</param>
     /// <returns>Token JWT e informações do usuário</returns>
     [HttpPost("login")]
-    [EnableRateLimiting("LoginPolicy")]
+    [Clipper.API.Attributes.RateLimit(RequestsPerMinute = 5, RequestsPerHour = 20)]
     [AllowAnonymous]
     [SwaggerOperation(
         Summary = "Login de usuário",
@@ -42,14 +42,24 @@ public class AuthController : ApiControllerBase
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
     public async Task<ActionResult<AuthResponse>> Login([FromBody] LoginRequest request)
     {
+        var bruteForceProtection = HttpContext.RequestServices.GetService<Clipper.Application.Common.Interfaces.IBruteForceProtectionService>();
+        var clientId = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+        if (bruteForceProtection != null && await bruteForceProtection.IsBlocked(clientId))
+        {
+            return StatusCode(429, "Too many failed login attempts. Account temporarily locked.");
+        }
         try
         {
             var command = new LoginCommand(request.Email, request.Password);
             var result = await Mediator.Send(command);
+            if (bruteForceProtection != null)
+                await bruteForceProtection.RecordSuccessfulAttempt(clientId);
             return Ok(result);
         }
         catch (UnauthorizedAccessException)
         {
+            if (bruteForceProtection != null)
+                await bruteForceProtection.RecordFailedAttempt(clientId);
             return Unauthorized(new ProblemDetails
             {
                 Status = StatusCodes.Status401Unauthorized,
