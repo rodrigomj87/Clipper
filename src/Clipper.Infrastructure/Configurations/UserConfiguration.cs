@@ -39,11 +39,11 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         // Configurações de auditoria
         builder.Property(u => u.CreatedAt)
             .IsRequired()
-            .HasDefaultValueSql("CURRENT_TIMESTAMP");
+            .HasDefaultValueSql("GETDATE()");
 
         builder.Property(u => u.UpdatedAt)
             .IsRequired()
-            .HasDefaultValueSql("CURRENT_TIMESTAMP");
+            .HasDefaultValueSql("GETDATE()");
 
         builder.Property(u => u.IsDeleted)
             .HasDefaultValue(false);

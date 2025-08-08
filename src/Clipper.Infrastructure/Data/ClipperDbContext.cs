@@ -41,6 +41,11 @@ public class ClipperDbContext : DbContext
     /// </summary>
     public DbSet<ProcessingJob> ProcessingJobs { get; set; }
 
+    /// <summary>
+    /// Refresh tokens para autenticação
+    /// </summary>
+    public DbSet<RefreshToken> RefreshTokens { get; set; }
+
     #endregion
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
