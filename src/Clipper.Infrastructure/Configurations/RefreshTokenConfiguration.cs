@@ -37,11 +37,11 @@ public class RefreshTokenConfiguration : IEntityTypeConfiguration<RefreshToken>
         // Configurações de auditoria
         builder.Property(rt => rt.CreatedAt)
             .IsRequired()
-            .HasDefaultValueSql("CURRENT_TIMESTAMP");
+            .HasDefaultValueSql("GETDATE()");
 
         builder.Property(rt => rt.UpdatedAt)
             .IsRequired()
-            .HasDefaultValueSql("CURRENT_TIMESTAMP");
+            .HasDefaultValueSql("GETDATE()");
 
         builder.Property(rt => rt.IsDeleted)
             .HasDefaultValue(false);
