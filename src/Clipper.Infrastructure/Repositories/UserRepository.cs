@@ -66,4 +66,14 @@ public class UserRepository : IUserRepository
             .Where(u => !u.IsDeleted)
             .AnyAsync(u => u.Email.ToLower() == email.ToLower());
     }
+
+    /// <summary>
+    /// Verifica se existe um usuário com o email específico (método alternativo)
+    /// </summary>
+    public async Task<bool> ExistsWithEmailAsync(string email)
+    {
+        return await _context.Users
+            .Where(u => !u.IsDeleted)
+            .AnyAsync(u => u.Email.ToLower() == email.ToLower());
+    }
 }

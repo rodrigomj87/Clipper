@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using Clipper.API.Features.Authentication.Requests;
@@ -7,6 +8,7 @@ using Clipper.Application.Features.Authentication.Commands.Register;
 using Clipper.Application.Features.Authentication.Commands.RefreshToken;
 using Clipper.Application.Features.Authentication.Commands.Logout;
 using Clipper.Application.Features.Authentication.Common;
+using Clipper.Common.Exceptions;
 
 namespace Clipper.API.Controllers;
 
@@ -24,6 +26,7 @@ public class AuthController : ApiControllerBase
     /// <param name="request">Dados de login (email e senha)</param>
     /// <returns>Token JWT e informações do usuário</returns>
     [HttpPost("login")]
+    [EnableRateLimiting("LoginPolicy")]
     [AllowAnonymous]
     [SwaggerOperation(
         Summary = "Login de usuário",
@@ -91,6 +94,15 @@ public class AuthController : ApiControllerBase
             var command = new RegisterCommand(request.Email, request.Password, request.ConfirmPassword, request.Name);
             var result = await Mediator.Send(command);
             return CreatedAtAction(nameof(Register), result);
+        }
+        catch (ConflictException ex)
+        {
+            return Conflict(new ProblemDetails
+            {
+                Status = StatusCodes.Status409Conflict,
+                Title = "Email já está em uso",
+                Detail = ex.Message
+            });
         }
         catch (InvalidOperationException ex) when (ex.Message.Contains("já existe"))
         {

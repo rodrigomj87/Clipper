@@ -150,7 +150,7 @@ public class TestAuthorizationController : ApiControllerBase
     /// Endpoint que testa ownership
     /// </summary>
     [HttpGet("ownership/{resourceId}")]
-    [RequireRole("User")]
+    [RequireOwnership("resourceId", "user")]
     public ActionResult<object> OwnershipEndpoint(int resourceId)
     {
         var userId = User.GetUserId();

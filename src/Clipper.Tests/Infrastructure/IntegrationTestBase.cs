@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.SqlServer;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Authentication;
@@ -13,20 +14,42 @@ using System.Text.Json;
 namespace Clipper.Tests.Infrastructure;
 
 /// <summary>
+/// Helper class to manage test database names
+/// </summary>
+public static class TestDatabaseHelper
+{
+    private static readonly ThreadLocal<string> _currentTestDatabaseName = new();
+    
+    public static string GetTestDatabaseName()
+    {
+        if (_currentTestDatabaseName.Value == null)
+        {
+            _currentTestDatabaseName.Value = $"TestDb_{Guid.NewGuid()}";
+        }
+        return _currentTestDatabaseName.Value;
+    }
+    
+    public static void SetTestDatabaseName(string name)
+    {
+        _currentTestDatabaseName.Value = name;
+    }
+}
+
+/// <summary>
 /// Classe base para testes de integração do Clipper
 /// </summary>
 /// <remarks>
 /// Responsabilidade: configurar ambiente de teste isolado com banco em memória
 /// </remarks>
-public abstract class IntegrationTestBase : IClassFixture<WebApplicationFactory<Program>>, IDisposable
+public abstract class IntegrationTestBase : IClassFixture<WebApplicationFactory<Program>>, IAsyncLifetime, IDisposable
 {
     protected readonly WebApplicationFactory<Program> Factory;
     protected readonly HttpClient Client;
     protected readonly IServiceScope Scope;
     protected readonly ClipperDbContext DbContext;
-
     protected IntegrationTestBase(WebApplicationFactory<Program> factory)
     {
+        // Usar banco fixo criado manualmente
         Factory = factory.WithWebHostBuilder(builder =>
         {
             builder.ConfigureServices(services =>
@@ -50,11 +73,11 @@ public abstract class IntegrationTestBase : IClassFixture<WebApplicationFactory<
                     services.Remove(descriptor);
                 }
 
-                // Adiciona DbContext em memória
+                // Adicionar contexto usando SQL Server local (local)\SQLSERVER2022, usuário 'sa', senha 'Tec@123!'
+                var connectionString = "Server=127.0.0.1,1433;Database=ClipperTestDb;User Id=sa;Password=Tec@123!;MultipleActiveResultSets=true;TrustServerCertificate=True";
                 services.AddDbContext<ClipperDbContext>(options =>
                 {
-                    options.UseInMemoryDatabase($"TestDb_{Guid.NewGuid()}");
-                    options.EnableSensitiveDataLogging();
+                    options.UseSqlServer(connectionString);
                 });
 
                 // Remove autenticação JWT existente COMPLETAMENTE
@@ -100,9 +123,11 @@ public abstract class IntegrationTestBase : IClassFixture<WebApplicationFactory<
         Client = Factory.CreateClient();
         Scope = Factory.Services.CreateScope();
         DbContext = Scope.ServiceProvider.GetRequiredService<ClipperDbContext>();
-        
-        // Garantir que o banco está criado
-        DbContext.Database.EnsureCreated();
+
+        // Abrir conexão e garantir que o schema seja criado
+        var connection = DbContext.Database.GetDbConnection();
+        connection.Open();
+        // Limpeza será feita antes de cada teste via IAsyncLifetime
     }
 
     /// <summary>
@@ -119,9 +144,26 @@ public abstract class IntegrationTestBase : IClassFixture<WebApplicationFactory<
     /// </summary>
     protected virtual async Task CleanupDatabaseAsync()
     {
-        DbContext.Users.RemoveRange(DbContext.Users);
-        DbContext.RefreshTokens.RemoveRange(DbContext.RefreshTokens);
+        // Limpa todas as tabelas e reseta identidade
+        var tableNames = new[] {
+            "RefreshToken",
+            "User"
+        };
+        foreach (var table in tableNames)
+        {
+            Console.WriteLine($"Limpando tabela: {table}");
+            await DbContext.Database.ExecuteSqlRawAsync($"DELETE FROM [{table}]");
+            await DbContext.Database.ExecuteSqlRawAsync($"DBCC CHECKIDENT ('[{table}]', RESEED, 0)");
+        }
         await DbContext.SaveChangesAsync();
+
+        // Verifica se a tabela Users está realmente vazia
+        var usersCount = await DbContext.Users.CountAsync();
+        Console.WriteLine($"Usuários restantes após limpeza: {usersCount}");
+        if (usersCount > 0)
+        {
+            throw new InvalidOperationException($"A tabela Users não foi limpa corretamente. Restam {usersCount} registros.");
+        }
     }
 
     /// <summary>
@@ -154,10 +196,12 @@ public abstract class IntegrationTestBase : IClassFixture<WebApplicationFactory<
     /// </summary>
     protected async Task<string> GetValidUserTokenAsync()
     {
+        // Gera e-mail único para cada usuário de teste
+        var uniqueEmail = $"user-{Guid.NewGuid()}@example.com";
         var registerRequest = new 
         {
             Name = "Test User",
-            Email = $"user-{Guid.NewGuid()}@example.com",
+            Email = uniqueEmail,
             Password = "Password123!"
         };
 
@@ -178,7 +222,7 @@ public abstract class IntegrationTestBase : IClassFixture<WebApplicationFactory<
         // Se o registro falhar (usuário já existe), tentar login
         var loginRequest = new 
         {
-            Email = registerRequest.Email,
+            Email = uniqueEmail,
             Password = registerRequest.Password
         };
 
@@ -215,4 +259,17 @@ public abstract class IntegrationTestBase : IClassFixture<WebApplicationFactory<
         Factory?.Dispose();
         GC.SuppressFinalize(this);
     }
+
+    /// <summary>
+    /// Executa antes de cada teste para garantir isolamento
+    /// </summary>
+    public async Task InitializeAsync()
+    {
+        await CleanupDatabaseAsync();
+    }
+
+    /// <summary>
+    /// Executa após cada teste (não usado)
+    /// </summary>
+    public Task DisposeAsync() => Task.CompletedTask;
 }

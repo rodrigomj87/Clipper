@@ -1,7 +1,9 @@
 using Microsoft.Extensions.Logging;
 using Clipper.Application.Common.Interfaces;
 using Clipper.Application.Features.Authentication.Common;
+using Microsoft.EntityFrameworkCore;
 using Clipper.Domain.Entities;
+using Clipper.Common.Exceptions;
 using BCrypt.Net;
 
 namespace Clipper.Infrastructure.Services;
@@ -103,11 +105,12 @@ public class AuthService : IAuthService
         {
             _logger.LogInformation("Tentativa de registro para email: {Email}", email);
 
-            // Verificar se email já existe
-            if (await _userRepository.EmailExistsAsync(email))
+            // Verificação explícita de email existente
+            var emailExists = await _userRepository.EmailExistsAsync(email);
+            if (emailExists)
             {
                 _logger.LogWarning("Tentativa de registro com email já existente: {Email}", email);
-                throw new InvalidOperationException("Email já cadastrado no sistema");
+                throw new ConflictException("Email já cadastrado no sistema");
             }
 
             // Criar hash da senha
@@ -123,7 +126,23 @@ public class AuthService : IAuthService
                 LastLoginAt = DateTime.UtcNow
             };
 
-            var createdUser = await _userRepository.CreateAsync(user);
+            User createdUser;
+            try
+            {
+                createdUser = await _userRepository.CreateAsync(user);
+            }
+            catch (DbUpdateException dbEx)
+            {
+                var msg = dbEx.InnerException?.Message ?? dbEx.Message;
+                // SQL Server, SQLite, PostgreSQL, MySQL: verifica padrões conhecidos
+                if (msg.Contains("UNIQUE") || msg.Contains("duplicate") || msg.Contains("IX_Users_Email") || msg.Contains("Violation of UNIQUE KEY constraint") || msg.Contains("UNIQUE constraint failed") || msg.Contains("Duplicate entry"))
+                {
+                    _logger.LogWarning("Tentativa de registro com email já existente (via exceção): {Email}", email);
+                    throw new ConflictException("Email já cadastrado no sistema");
+                }
+                _logger.LogError(dbEx, "Erro de banco durante registro para email: {Email}", email);
+                throw new Exception("Erro interno durante registro");
+            }
 
             // Gerar tokens
             var token = _jwtTokenService.GenerateToken(createdUser);
@@ -145,7 +164,7 @@ public class AuthService : IAuthService
                 userDto
             );
         }
-        catch (InvalidOperationException)
+        catch (ConflictException)
         {
             throw;
         }

@@ -3,8 +3,61 @@ using Clipper.Infrastructure.Configuration;
 using Clipper.API.Extensions;
 using Clipper.Common.Settings;
 using Microsoft.EntityFrameworkCore;
+using MediatR;
+using FluentValidation;
+using Microsoft.AspNetCore.RateLimiting;
+using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Adicionar Rate Limiting
+builder.Services.AddRateLimiter(options =>
+{
+    // Helper para extrair IP do header X-Forwarded-For ou RemoteIpAddress
+    string GetClientIp(HttpContext context)
+    {
+        if (context.Request.Headers.TryGetValue("X-Forwarded-For", out var forwarded))
+        {
+            var ip = forwarded.FirstOrDefault();
+            if (!string.IsNullOrWhiteSpace(ip))
+                return ip;
+        }
+        return context.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+    }
+
+    // Política global: 100 requisições por minuto por IP
+    options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: GetClientIp(httpContext),
+            factory: _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 100,
+                Window = TimeSpan.FromMinutes(1),
+                QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                QueueLimit = 0
+            }
+        )
+    );
+
+    // Política específica para login: 5 requisições por minuto por IP
+    options.AddPolicy("LoginPolicy", context =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: GetClientIp(context),
+            factory: _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 5,
+                Window = TimeSpan.FromMinutes(1),
+                QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                QueueLimit = 0
+            }
+        )
+    );
+    options.OnRejected = async (context, token) =>
+    {
+        context.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
+        await context.HttpContext.Response.WriteAsync("Too many requests. Please try again later.", token);
+    };
+});
 
 // Configurar e validar JwtSettings
 var jwtSettings = new JwtSettings();
@@ -38,6 +91,12 @@ builder.Services.AddMediatR(config =>
 {
     config.RegisterServicesFromAssembly(typeof(Clipper.Application.Features.Authentication.Commands.Login.LoginCommand).Assembly);
 });
+
+// Add pipeline behaviors
+builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(Clipper.Application.Common.Behaviors.ValidationBehavior<,>));
+
+// Configure FluentValidation
+builder.Services.AddValidatorsFromAssembly(typeof(Clipper.Application.Features.Authentication.Commands.Login.LoginCommand).Assembly);
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -73,7 +132,7 @@ builder.Services.AddSwaggerGen(c =>
 
 // Configure Entity Framework
 builder.Services.AddDbContext<ClipperDbContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Configure Infrastructure Layer
 builder.Services.AddInfrastructure(builder.Configuration);
@@ -87,10 +146,14 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAngular", policy =>
     {
-        policy.WithOrigins("http://localhost:4200", "https://localhost:4200")
-              .AllowAnyMethod()
-              .AllowAnyHeader()
-              .AllowCredentials();
+        policy.WithOrigins(
+            "http://localhost:4200",
+            "https://localhost:4200",
+            "http://localhost:3000"
+        )
+        .AllowAnyMethod()
+        .AllowAnyHeader()
+        .AllowCredentials();
     });
 });
 
@@ -107,7 +170,19 @@ if (app.Environment.IsDevelopment())
     });
 }
 
+
+// Middleware de Rate Limiting
+app.UseRateLimiter();
+
 app.UseHttpsRedirection();
+// Middleware de headers de segurança
+app.Use(async (context, next) =>
+{
+    context.Response.Headers["X-Content-Type-Options"] = "nosniff";
+    context.Response.Headers["X-Frame-Options"] = "DENY";
+    context.Response.Headers["X-XSS-Protection"] = "1; mode=block";
+    await next();
+});
 
 // Configure CORS
 app.UseCors("AllowAngular");
@@ -117,6 +192,10 @@ app.UseAuthentication(); // Deve vir antes de UseAuthorization
 app.UseJwtMiddleware(); // Middleware customizado JWT
 app.UseAuthorization();
 
+// Mapear controllers com política de rate limiting para login
+
+
+// Mapear os demais controllers normalmente
 app.MapControllers();
 
 // Endpoint de teste para verificar autenticação

@@ -30,6 +30,7 @@ public static class DependencyInjection
         // Serviços
         services.AddScoped<IJwtTokenService, JwtTokenService>();
         services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<IEmailValidationService, EmailValidationService>();
 
         return services;
     }

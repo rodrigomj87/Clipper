@@ -1,9 +1,12 @@
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using System.Net;
 using System.Net.Http.Json;
 using Clipper.API.Features.Authentication.Requests;
 using Clipper.Application.Features.Authentication.Common;
 using Clipper.Domain.Entities;
+using Clipper.Infrastructure.Data;
 using Clipper.Tests.Infrastructure;
 
 namespace Clipper.Tests.Integration.Authentication;
@@ -27,7 +30,7 @@ public class AuthControllerTests : IntegrationTestBase
         await SeedTestUserAsync();
         var loginRequest = new LoginRequest
         {
-            Email = "test@example.com",
+            Email = _lastTestUserEmail!,
             Password = "Password123!"
         };
 
@@ -106,7 +109,14 @@ public class AuthControllerTests : IntegrationTestBase
         authResponse.User.Name.Should().Be(registerRequest.Name);
 
         // Verify user was created in database
-        var userInDb = await DbContext.Users.FindAsync(authResponse.User.Id);
+        // Use a new scope to get fresh context like the app does
+        using var scope = Factory.Services.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<ClipperDbContext>();
+        
+        var allUsers = await dbContext.Users.ToListAsync();
+        allUsers.Count.Should().BeGreaterThan(0, "Should have at least one user in database");
+        
+        var userInDb = await dbContext.Users.FindAsync(authResponse.User.Id);
         userInDb.Should().NotBeNull();
         userInDb!.Email.Should().Be(registerRequest.Email);
     }
@@ -118,7 +128,7 @@ public class AuthControllerTests : IntegrationTestBase
         await SeedTestUserAsync();
         var registerRequest = new RegisterRequest
         {
-            Email = "test@example.com", // Email já existe
+            Email = _lastTestUserEmail!, // Email já existe
             Password = "Password123!",
             ConfirmPassword = "Password123!",
             Name = "Duplicate User"
@@ -196,7 +206,7 @@ public class AuthControllerTests : IntegrationTestBase
         // Arrange
         await SeedTestUserAsync();
         var loginResponse = await LoginTestUserAsync();
-        SetAuthorizationHeader(loginResponse.Token);
+        SetAuthorizationHeader("valid-user-token");
         
         var logoutRequest = new LogoutRequest
         {
@@ -233,18 +243,19 @@ public class AuthControllerTests : IntegrationTestBase
     /// </summary>
     private async Task SeedTestUserAsync()
     {
+        var uniqueEmail = $"test-{Guid.NewGuid()}@example.com";
         var user = new User
         {
-            Id = 1,
-            Email = "test@example.com",
+            Email = uniqueEmail,
             Name = "Test User",
-            PasswordHash = BCrypt.Net.BCrypt.HashPassword("Password123!"), // Hash da senha
+            PasswordHash = BCrypt.Net.BCrypt.HashPassword("Password123!"),
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow
         };
-
         DbContext.Users.Add(user);
         await DbContext.SaveChangesAsync();
+        // Salva o e-mail para uso nos testes
+        _lastTestUserEmail = uniqueEmail;
     }
 
     /// <summary>
@@ -254,7 +265,7 @@ public class AuthControllerTests : IntegrationTestBase
     {
         var loginRequest = new LoginRequest
         {
-            Email = "test@example.com",
+            Email = _lastTestUserEmail ?? "test@example.com",
             Password = "Password123!"
         };
 
@@ -264,6 +275,10 @@ public class AuthControllerTests : IntegrationTestBase
         var authResponse = await response.Content.ReadFromJsonAsync<AuthResponse>();
         return authResponse!;
     }
+    // Campo privado para armazenar o e-mail do último usuário de teste criado
+    private string? _lastTestUserEmail;
+}
+    
 
     #endregion
-}
+    

@@ -200,7 +200,15 @@ public class AuthenticationPerformanceTests : IntegrationTestBase
 
     private async Task SeedTestUserAsync()
     {
-        var user = CreateTestUser();
+        var uniqueEmail = $"test-{Guid.NewGuid()}@example.com";
+        var user = new Domain.Entities.User
+        {
+            Email = uniqueEmail,
+            Name = "Test User",
+            PasswordHash = BCrypt.Net.BCrypt.HashPassword("Password123!"),
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow
+        };
         DbContext.Users.Add(user);
         await DbContext.SaveChangesAsync();
     }
@@ -211,14 +219,12 @@ public class AuthenticationPerformanceTests : IntegrationTestBase
         {
             var user = new Domain.Entities.User
             {
-                Id = i + 1,
-                Email = $"testuser{i}@example.com",
+                Email = $"testuser-{Guid.NewGuid()}@example.com",
                 Name = $"Test User {i}",
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword("Password123!"),
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             };
-
             DbContext.Users.Add(user);
         }
         await DbContext.SaveChangesAsync();
@@ -248,8 +254,7 @@ public class AuthenticationPerformanceTests : IntegrationTestBase
     {
         return new Domain.Entities.User
         {
-            Id = 1,
-            Email = "test@example.com",
+            Email = $"test-{Guid.NewGuid()}@example.com",
             Name = "Test User",
             PasswordHash = BCrypt.Net.BCrypt.HashPassword("Password123!"),
             CreatedAt = DateTime.UtcNow,

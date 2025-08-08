@@ -412,16 +412,15 @@ public class AuthenticationE2ETests : IntegrationTestBase
 
     private async Task SeedTestUserAsync()
     {
+        var uniqueEmail = $"test-{Guid.NewGuid()}@example.com";
         var user = new Domain.Entities.User
         {
-            Id = 1,
-            Email = "test@example.com",
+            Email = uniqueEmail,
             Name = "Test User",
             PasswordHash = BCrypt.Net.BCrypt.HashPassword("Password123!"),
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow
         };
-
         DbContext.Users.Add(user);
         await DbContext.SaveChangesAsync();
     }

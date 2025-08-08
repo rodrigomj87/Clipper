@@ -41,7 +41,9 @@ public class JwtTokenService : IJwtTokenService
             new(ClaimTypes.Email, user.Email),
             new("user_id", user.Id.ToString()),
             new("email", user.Email),
-            new("name", user.Name)
+            new("name", user.Name),
+            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()), // garante token único
+            new(JwtRegisteredClaimNames.Iat, DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString()) // issued at
         };
 
         var tokenDescriptor = new SecurityTokenDescriptor

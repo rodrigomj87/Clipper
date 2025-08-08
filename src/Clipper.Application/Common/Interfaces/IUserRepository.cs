@@ -41,4 +41,11 @@ public interface IUserRepository
     /// <param name="email">Email a verificar</param>
     /// <returns>True se email já existe</returns>
     Task<bool> EmailExistsAsync(string email);
+
+    /// <summary>
+    /// Verifica se existe um usuário com o email específico (método alternativo)
+    /// </summary>
+    /// <param name="email">Email a verificar</param>
+    /// <returns>True se usuário existe com esse email</returns>
+    Task<bool> ExistsWithEmailAsync(string email);
 }
