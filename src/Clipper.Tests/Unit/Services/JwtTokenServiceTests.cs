@@ -23,9 +23,13 @@ public class JwtTokenServiceTests
 
     public JwtTokenServiceTests()
     {
+        // Generate a random 32-byte secret key for each test run
+        var secretKeyBytes = new byte[32];
+        RandomNumberGenerator.Fill(secretKeyBytes);
+        var randomSecretKey = Convert.ToBase64String(secretKeyBytes);
         _jwtSettings = new JwtSettings
         {
-            SecretKey = "my-super-secret-key-for-testing-purposes-32-chars-minimum",
+            SecretKey = randomSecretKey,
             Issuer = "ClipperTest",
             Audience = "ClipperTestUsers",
             ExpirationInMinutes = 15,
